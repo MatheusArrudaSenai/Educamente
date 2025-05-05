@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico do Aluno | Educa Mente</title>
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Certifique-se que os caminhos estão corretos -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style_solicitacoes.css"> <!-- Pode ser necessário para estilos da navbar -->
+    <link rel="stylesheet" href="css/historico_aluno.css">
+    <script src="js/utils.js"></script>
+    <script src="js/icons.js"></script>
+    
+</head>
+<body>
+    <!-- Navbar (Padronizada - Copiada da versão anterior de historico.html) -->
+    <nav class="navbar">
+      <div class="container navbar-container">
+        <a href="/painel" class="navbar-brand">
+          Educa Mente
+        </a>
+        <ul class="navbar-menu">
+          <li class="navbar-item"> <a href="/painel" class="navbar-link" title="Painel"> <span class="navbar-icon" id="icon-home"></span> <span>Dashboard</span> </a> </li>
+          <li class="navbar-item"> <a href="/historico" class="navbar-link active" title="Histórico"> <span class="navbar-icon" id="icon-history"></span> <span>Histórico</span> </a> </li> <!-- Active aqui -->
+          <li class="navbar-item"> <a href="/solicitacoes" class="navbar-link" title="Solicitações"> <span class="navbar-icon" id="icon-requests"></span> <span>Solicitações</span> </a> </li> <!-- Sem active aqui -->
+        </ul>
+        <!-- Wrapper para agrupar ícones e switch (Padronizado) -->
+        <div class="dark-mode-toggle-wrapper">
+          <i class="fas fa-sun" id="icon-sun" title="Modo Claro"></i>
+          <i class="fas fa-moon" id="icon-moon" title="Modo Escuro"></i>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content (Original de historico_aluno.html) -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Cabeçalho e Card de Infos -->
+             <div class="page-header"> <h1 class="page-title" id="page-title">Histórico do Aluno</h1> <p class="page-subtitle" id="page-subtitle">Carregando...</p> </div>
+             <div class="card" id="student-info-card" style="display: none;">
+                 <div class="card-header"> <h2 class="card-title">Informações do Aluno</h2> </div>
+                 <div class="card-body"> <div class="student-info-grid"> <div class="info-item"> <span class="info-item-label">Nome</span> <span class="info-item-value" id="student-name"><i class="fas fa-user"></i><span>-</span></span> </div> <div class="info-item"> <span class="info-item-label">Idade</span> <span class="info-item-value" id="student-age"><i class="fas fa-birthday-cake"></i><span>-</span></span> </div> <div class="info-item"> <span class="info-item-label">Turma</span> <span class="info-item-value" id="student-grade"><i class="fas fa-graduation-cap"></i><span>-</span></span> </div> <div class="info-item"> <span class="info-item-label">Curso</span> <span class="info-item-value" id="student-course"><i class="fas fa-book"></i><span>-</span></span> </div> <div class="info-item"> <span class="info-item-label">Unidade</span> <span class="info-item-value" id="student-unit"><i class="fas fa-building"></i><span>-</span></span> </div> <div class="info-item"> <span class="info-item-label">Telefone</span> <span class="info-item-value" id="student-phone"><i class="fas fa-phone"></i><span>-</span></span> </div> </div> </div>
+             </div>
+
+             <!-- Card de Histórico -->
+            <div class="card" id="appointment-history-card" style="display: none;">
+                 <div class="card-header"> <h2 class="card-title">Registros de Atendimento</h2> </div>
+                 <div class="card-body">
+                     <div class="loading-spinner" id="history-loading" style="display: block;"></div>
+                     <!-- Lista Real (será populada) -->
+                     <div id="student-appointment-list" style="display: none;"> </div>
+                     <!-- Mensagens -->
+                     <div id="no-appointments-message" style="display: none;" class="text-center py-12 text-gray-500"> Nenhum registro encontrado. </div>
+                     <div id="student-not-found-message" style="display: none;" class="text-center py-12 text-gray-500"> Aluno não encontrado. </div>
+                 </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Original de historico_aluno.html) -->
+    <footer class="footer">
+        <!-- SEU CÓDIGO DO FOOTER ORIGINAL VAI AQUI -->
+        <div class="container footer-content"><p class="footer-text">© 2025 Educa Mente</p></div>
+    </footer>
+
+    <!-- Modal (Original de historico_aluno.html) -->
+    <div class="modal-overlay" id="appointment-details-modal-overlay">
+         <div class="modal-content" id="appointment-details-modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="modal-header"> <h3 class="modal-title" id="modal-title">Detalhes</h3> <button class="modal-close-btn" id="modal-close-button" aria-label="Fechar">×</button> </div>
+            <div class="modal-body" id="modal-body-content"> <p>Carregando...</p> </div>
+        </div>
+    </div>
+
+    <!-- Scripts (Original de historico_aluno.html, com ajuste no setup do Dark Mode) -->
+    <script>
+        // Variaveis globais (Originais)
+        let currentStudentName = '';
+        let modalOverlay, modalContent, modalTitle, modalBody, modalCloseBtn;
+        window.historicoAlunoData = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+  try {
+    console.log("DEBUG: DOMContentLoaded - Iniciando setup historico_aluno...");
+    if (typeof utils === 'undefined') { console.warn("AVISO: utils.js não carregado."); }
+    if (typeof icons === 'undefined') { console.warn("AVISO: icons.js não carregado."); }
+
+    setupNavbarIcons();
+    setupDarkModeToggle();
+    if (!setupModalElements()) { throw new Error("Falha ao configurar modal."); }
+    if (!setupCardActionListeners()) { throw new Error("Falha ao configurar listeners dos cards."); }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const solicitacaoId = urlParams.get('id');
+
+    fetch(`/api/historico_por_id/${solicitacaoId}`)
+  .then(res => res.json())
+  .then(data => {
+    console.log("Dados recebidos da API (Re-check):", data);
+    window.historicoAlunoData = data;
+    if (!data || !data.aluno) {
+      document.getElementById('student-not-found-message').style.display = 'block';
+      return;
+    }
+
+    preencherCabecalho(data.aluno);
+    preencherRegistros(data.appointmentHistory);
+
+    // Mostra o card de histórico
+    document.getElementById('appointment-history-card').style.display = 'block';
+    document.getElementById('history-loading').style.display = 'none';
+  })
+  .catch(err => {
+    console.error('Erro ao buscar dados:', err);
+    document.getElementById('student-not-found-message').textContent = "Erro ao carregar dados.";
+    document.getElementById('student-not-found-message').style.display = 'block';
+  });
+
+// Preenche o cabeçalho com dados do aluno
+function preencherCabecalho(aluno) {
+  if (!aluno) { console.error("preencherCabecalho: Dados nulos."); return; }
+  console.log("DEBUG: Preenchendo cabeçalho do aluno...");
+
+  const formatPhone = typeof utils !== 'undefined' && utils?.formatPhone
+                      ? utils.formatPhone
+                      : function(p) { return p || 'Não informado'; };
+
+  const calcularIdade = (dataNasc) => {
+      if (!dataNasc) return '-';
+      try {
+        const nasc = new Date(dataNasc);
+        const hoje = new Date();
+        let idade = hoje.getFullYear() - nasc.getFullYear();
+        const m = hoje.getMonth() - nasc.getMonth();
+        if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+        return isNaN(idade) ? '-' : idade;
+      } catch(e) {
+        return '-';
+      }
+  };
+
+  const age = calcularIdade(aluno.studentAge);
+
+
+  const icons = window.icons || {};
+
+  setTextContent('student-name', aluno.studentName, icons?.user || '<i class="fas fa-user"></i>');
+  setTextContent('student-age', `${age} anos`, icons?.birthday || '<i class="fas fa-birthday-cake"></i>');
+  setTextContent('student-grade', aluno.grade, icons?.graduation || '<i class="fas fa-graduation-cap"></i>');
+  setTextContent('student-course', aluno.curso, icons?.course || '<i class="fas fa-book"></i>');
+  setTextContent('student-unit', aluno.unit, icons?.building || '<i class="fas fa-building"></i>');
+  setTextContent('student-phone', formatPhone(aluno.phone), icons?.phone || '<i class="fas fa-phone"></i>');
+
+  // Mostra o card de informações
+  const infoCard = document.getElementById('student-info-card');
+  if (infoCard) infoCard.style.display = 'block';
+  else console.error("ERRO: Card de info do aluno não encontrado.");
+}
+
+function setTextContent(elementId, value, iconHtml = '') {
+  const element = document.getElementById(elementId); // Get the target span (e.g., #student-course)
+  if (element) {
+    
+    let content = '';
+    if (iconHtml) {
+      content += iconHtml + ' '; 
+    }
+
+    content += `<span>${value ?? '-'}</span>`;
+    element.innerHTML = content; 
+  } else {
+    console.error(`Element not found with ID: ${elementId}`);
+  }
+}
+
+
+// Gera os containers de atendimentos
+function preencherRegistros(registros) {
+  const lista = document.getElementById('student-appointment-list');
+  lista.innerHTML = '';
+  lista.style.display = 'block';
+
+  if (!registros.length) {
+    document.getElementById('no-appointments-message').style.display = 'block';
+    return;
+  }
+
+  registros.forEach(appointment => {
+    // Ícones com fallback
+    const calendarIcon = icons?.calendar || '<i class="far fa-calendar-alt"></i>';
+    const clockIcon = icons?.clock || '<i class="far fa-clock"></i>';
+    const typeIcon = icons?.tag || '<i class="fas fa-tag"></i>';
+    const notesIcon = icons?.notes || '<i class="fas fa-sticky-note"></i>';
+    const viewIcon = icons?.eye || '<i class="fas fa-eye"></i>';
+    const editIcon = icons?.edit || '<i class="fas fa-edit"></i>';
+    const addIcon = icons?.add || '<i class="fas fa-plus"></i>';
+    const saveIcon = icons?.save || '<i class="fas fa-save"></i>';
+    const cancelIcon = icons?.cancel || '<i class="fas fa-times"></i>';
+    const userIcon = icons?.user || '<i class="fas fa-user"></i>';
+    const courseIcon = icons?.course || '<i class="fas fa-book"></i>';
+    const unitIcon = icons?.building || '<i class="fas fa-building"></i>';
+
+    // Dados com fallback
+    const appDate = appointment.date ?? null;
+    const appTime = appointment.horario ?? null;
+    const appType = appointment.type ?? 'Sessão de Acompanhamento';
+    const appStudentName = appointment.studentName ?? 'N/A';
+    const appCourse = appointment.course ?? 'N/A';
+    const appUnit = appointment.unit ?? 'N/A';
+    const currentNotes = appointment.observacao ?? '';
+    const hasNotes = currentNotes.trim() !== '';
+
+    const notesDisplayHTML = hasNotes
+      ? `<div>${currentNotes.replace(/\n/g, '<br>')}</div>`
+      : `<div class="no-notes">(Nenhuma observação registrada)</div>`;
+
+    const editButtonText = hasNotes ? 'Editar Nota' : 'Adicionar Nota';
+    const editButtonIcon = hasNotes ? editIcon : addIcon;
+
+    // Cria o card
+    const div = document.createElement('div');
+    div.className = 'appointment-entry';
+    div.dataset.appointmentId = appointment.id;
+
+    div.innerHTML = `
+      <div class="appointment-entry-header">
+        <span class="appointment-date-time">
+          ${calendarIcon} ${formatarData(appDate)}   
+          ${clockIcon} ${appTime?.slice(0,5) || '--:--'}
+        </span>
+        <div class="appointment-header-right">
+          <span class="appointment-type">${typeIcon} ${appType}</span>
+          <span class="appointment-action-icon" title="Ver detalhes">${viewIcon}</span>
+        </div>
+      </div>
+      <div class="appointment-student-info">
+        <p title="Aluno">${userIcon} <span>${appStudentName}</span></p>
+        <p title="Curso">${courseIcon} <span>${appCourse}</span></p>
+        <p title="Unidade">${unitIcon} <span>${appUnit}</span></p>
+      </div>
+      <div class="appointment-notes-section">
+        <div class="appointment-notes-display">
+          <strong>${notesIcon} Observações:</strong>
+          ${notesDisplayHTML}
+        </div>
+        <div class="appointment-notes-controls">
+          <button class="btn btn-sm btn-outline-secondary btn-edit-note">
+            ${editButtonIcon} ${editButtonText}
+          </button>
+        </div>
+        <div class="appointment-notes-edit-form" style="display: none;">
+          <textarea placeholder="Digite a observação aqui...">${currentNotes}</textarea>
+          <div class="edit-actions">
+            <span class="edit-feedback"></span>
+            <button class="btn btn-sm btn-secondary btn-cancel-note" title="Cancelar">
+              ${cancelIcon} Cancelar
+            </button>
+            <button class="btn btn-sm btn-primary btn-save-note" title="Salvar Alterações">
+              ${saveIcon} Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Depois de innerHTML
+const textarea = div.querySelector("textarea");
+const editForm = div.querySelector(".appointment-notes-edit-form");
+const editButton = div.querySelector(".btn-edit-note");
+const cancelButton = div.querySelector(".btn-cancel-note");
+const saveButton = div.querySelector(".btn-save-note");
+const feedback = div.querySelector(".edit-feedback");
+
+// Mostra o formulário ao clicar em "Adicionar Nota" ou "Editar"
+
+
+    lista.appendChild(div);
+  });
+}
+
+// Utilitário para calcular idade a partir da data de nascimento
+function calcularIdade(dataNasc) {
+  const nasc = new Date(dataNasc);
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nasc.getFullYear();
+  const m = hoje.getMonth() - nasc.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+  return idade;
+}
+
+// Utilitário para formatar datas
+function formatarData(data) {
+  const d = new Date(data);
+  return d.toLocaleDateString('pt-BR');
+}
+
+// Função fictícia de edição
+function editarNota(solicitacaoId) {
+  alert(`Função de edição de nota para solicitação ID: ${solicitacaoId}`);
+  }
+} catch (err) {
+    console.error("Erro inesperado no setup:", err);
+  }
+});
+
+        // --- Funções de Setup (Originais, exceto Dark Mode) ---
+        function setupNavbarIcons() { try{document.getElementById('icon-home').innerHTML = icons?.home || '<i class="fas fa-home"></i>'; document.getElementById('icon-history').innerHTML = icons?.history || '<i class="fas fa-history"></i>'; document.getElementById('icon-requests').innerHTML = icons?.requests || '<i class="fas fa-bell"></i>';}catch(e){console.error("Erro Navbar icons:", e);} }
+
+        // --- setupDarkModeToggle ATUALIZADA para novo toggle ---
+        function setupDarkModeToggle() {
+            const toggle = document.getElementById('toggle-dark-mode');
+            if (!toggle) { console.warn("Toggle dark mode não encontrado."); return; }
+
+            // Função interna para aplicar o tema e evitar flash
+             const applyDarkModeUI = (isDark, initialLoad = false) => {
+                console.log(`Aplicando Dark Mode UI (historico_aluno): ${isDark}`);
+                if (!initialLoad) document.body.classList.add('no-transitions'); // Desabilita transições
+                document.body.classList.toggle('dark', isDark);
+
+                // Aplica aos elementos dinâmicos da página (cards de histórico, modal)
+                applyDarkModeToDynamicElements(isDark);
+
+                // Força reflow antes de reabilitar transições
+                 if (!initialLoad) {
+                     requestAnimationFrame(() => {
+                         requestAnimationFrame(() => { document.body.classList.remove('no-transitions'); });
+                     });
+                 }
+            };
+
+            // Aplica tema inicial baseado no localStorage
+            const darkModePref = localStorage.getItem('darkMode') === 'enabled';
+            toggle.checked = darkModePref;
+            applyDarkModeUI(darkModePref, true); // Aplica o tema inicial sem remover transições
+
+            // Listener para mudanças no toggle
+            toggle.addEventListener('change', function() {
+                const isChecked = this.checked;
+                applyDarkModeUI(isChecked); // Aplica o novo tema com tratamento de transição
+                localStorage.setItem('darkMode', isChecked ? 'enabled' : 'disabled'); // Salva preferência
+            });
+            console.log("DEBUG: Dark mode toggle (novo) configurado. Estado inicial:", darkModePref);
+        }
+        // --- Fim setupDarkModeToggle ATUALIZADA ---
+
+        function setupModalElements() { modalOverlay = document.getElementById('appointment-details-modal-overlay'); modalContent = document.getElementById('appointment-details-modal-content'); modalTitle = document.getElementById('modal-title'); modalBody = document.getElementById('modal-body-content'); modalCloseBtn = document.getElementById('modal-close-button'); if (!modalOverlay || !modalContent || !modalTitle || !modalBody || !modalCloseBtn) { console.error("ERRO: Elementos do modal não encontrados!"); return false; } modalCloseBtn.addEventListener('click', closeModal); modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) closeModal(); }); document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modalOverlay?.classList.contains('active')) closeModal(); }); console.log("DEBUG: Elementos do modal configurados."); return true; }
+        function setupCardActionListeners() {
+            const historyListContainer = document.getElementById('student-appointment-list');
+            if (!historyListContainer) { console.error("ERRO: Container #student-appointment-list não encontrado."); return false; }
+            // Delegação de evento no container pai
+            historyListContainer.addEventListener('click', handleCardAction);
+            console.log("DEBUG: Card action listeners configurados via delegação.");
+            return true;
+        }
+
+        // --- Handler de Ações do Card (Original) ---
+        function handleCardAction(event) {
+     try {
+        console.log("DEBUG: handleCardAction triggered by click on:", event.target); // Log clicked element
+        const target = event.target;
+        const entryElement = target.closest('.appointment-entry');
+        if (!entryElement) {
+            console.log("DEBUG: Click was not inside an .appointment-entry");
+            return; // Exit if click wasn't within a card
+        }
+        console.log("DEBUG: Found entry element:", entryElement);
+
+        // Retrieve ID from the card's dataset attribute
+        const appointmentId = entryElement.dataset.appointmentId;
+        console.log("DEBUG: Retrieved appointmentId from dataset:", appointmentId); // Log the ID found
+
+        if (!appointmentId) {
+            console.warn("WARN: data-appointment-id attribute missing or empty on:", entryElement);
+            return; // Exit if ID is missing
+        }
+
+        // Check specifically if the eye icon area was clicked
+        const iconClicked = target.closest('.appointment-action-icon');
+        console.log("DEBUG: Clicked on icon area (.appointment-action-icon)?", iconClicked); // Log the result
+
+        if (iconClicked) {
+            console.log(`DEBUG: Calling openAppointmentDetailsModal with ID: ${appointmentId}`);
+            openAppointmentDetailsModal(appointmentId);
+            return; // Action handled, exit
+        }
+
+        // Check for other button clicks within the same card
+        if (target.closest('.btn-edit-note')) {
+             console.log("DEBUG: Edit note button clicked");
+             // Ensure toggleNoteEditForm exists and is correct
+             if (typeof toggleNoteEditForm === 'function') {
+                 toggleNoteEditForm(entryElement, appointmentId);
+             } else { console.error("toggleNoteEditForm function not found"); }
+             return; // Action handled, exit
+         }
+        if (target.closest('.btn-save-note')) {
+             console.log("DEBUG: Save note button clicked");
+             const textarea = entryElement.querySelector('.appointment-notes-edit-form textarea');
+             // Ensure updateAppointmentNotes exists and is correct
+             if (textarea && typeof updateAppointmentNotes === 'function') {
+                 updateAppointmentNotes(appointmentId, textarea.value, entryElement);
+             } else { console.error("Textarea or updateAppointmentNotes function not found."); }
+             return; // Action handled, exit
+         }
+        if (target.closest('.btn-cancel-note')) {
+             console.log("DEBUG: Cancel note button clicked");
+             // Ensure toggleNoteEditForm exists and is correct
+             if (typeof toggleNoteEditForm === 'function') {
+                 toggleNoteEditForm(entryElement, appointmentId, true); // Pass forceHide=true
+             } else { console.error("toggleNoteEditForm function not found"); }
+             return; // Action handled, exit
+         }
+
+        console.log("DEBUG: Click inside entry, but not on a recognized action element.");
+
+     } catch (error) {
+        console.error("Erro em handleCardAction:", error);
+     }
+}
+
+        // --- Funções Principais e Auxiliares (Originais) ---
+        function handleError(subtitleMsg, fullErrorMsg) { console.error("handleError:", fullErrorMsg); const pageSubtitle = document.getElementById('page-subtitle'); if(pageSubtitle) pageSubtitle.textContent = subtitleMsg; const spinner = document.getElementById('history-loading'); if(spinner) spinner.style.display = 'none'; const errorMsgElement = document.getElementById('student-not-found-message'); if(errorMsgElement){ errorMsgElement.textContent = fullErrorMsg; errorMsgElement.style.display = 'block'; } const historyCard = document.getElementById('appointment-history-card'); if(historyCard) historyCard.style.display = 'block'; }
+        function loadStudentDataAndHistory(studentName) {
+    const historyListContainer = document.getElementById('student-appointment-list');
+    const noAppointmentsMsg = document.getElementById('no-appointments-message');
+    const loadingSpinner = document.getElementById('history-loading');
+    const appointmentHistoryCard = document.getElementById('appointment-history-card');
+
+    loadingSpinner.style.display = 'block';
+    historyListContainer.innerHTML = '';
+    historyListContainer.style.display = 'none';
+    noAppointmentsMsg.style.display = 'none';
+    document.getElementById('student-not-found-message').style.display = 'none';
+
+    try {
+        const studentAppointments = data.appointmentHistory;
+        const studentData = studentAppointments[0];
+
+        populateStudentInfo(studentData);
+
+        const pageSubtitle = document.getElementById('page-subtitle');
+        if (pageSubtitle) pageSubtitle.textContent = `Registros de atendimento para ${studentName}`;
+
+        if (!studentAppointments.length) {
+            noAppointmentsMsg.style.display = 'block';
+        } else {
+            studentAppointments.forEach(appointment => {
+                const cardData = { ...studentData, ...appointment };
+                const appointmentElement = createAppointmentEntryElement(cardData);
+                if (appointmentElement) historyListContainer.appendChild(appointmentElement);
+            });
+            historyListContainer.style.display = 'block';
+        }
+
+        appointmentHistoryCard.style.display = 'block';
+        applyDarkModeToDynamicElements(localStorage.getItem('darkMode') === 'enabled');
+    } catch (error) {
+        console.error("Erro ao carregar histórico:", error);
+        handleError("Erro ao carregar dados", `Ocorreu um erro: ${error.message}`);
+    } finally {
+        loadingSpinner.style.display = 'none';
+    }
+}
+
+
+        function populateStudentInfo(studentData) { if (!studentData) { console.error("populateStudentInfo: Dados nulos."); return; } console.log("DEBUG: Populando info do aluno..."); const formatPhone = utils?.formatPhone || function(p) { return p || '-'; }; setTextContent('student-name', studentData.studentName, icons?.user || '<i class="fas fa-user"></i>'); const birthDate = new Date(studentData.studentAge); const age = isNaN(birthDate) ? '-' : new Date().getFullYear() - birthDate.getFullYear(); setTextContent('student-age', `${age} anos`, icons?.birthday || '<i class="fas fa-birthday-cake"></i>'); setTextContent('student-grade', studentData.grade, icons?.graduation || '<i class="fas fa-graduation-cap"></i>'); setTextContent('student-course', studentData.course, icons?.course || '<i class="fas fa-book"></i>'); setTextContent('student-unit', studentData.unit, icons?.building || '<i class="fas fa-building"></i>'); setTextContent('student-phone', formatPhone(studentData.phone), icons?.phone || '<i class="fas fa-phone"></i>'); const infoCard = document.getElementById('student-info-card'); if (infoCard) infoCard.style.display = 'block'; else console.error("ERRO: Card de info do aluno não encontrado."); }
+        function setTextContent(elementId, value, iconHtml = '') {
+          const element = document.getElementById(elementId); // Get the target span (e.g., #student-course)
+          if (element) {
+        // Option 1: Rebuild using innerHTML (Simpler)
+            let content = '';
+              if (iconHtml) {
+                content += iconHtml + ' '; // Add icon and a space
+              }
+        // Add the actual value, wrapped in a span if you want to keep that structure
+            content += `<span>${value ?? '-'}</span>`;
+            element.innerHTML = content;
+          } else {
+            console.error(`Element not found with ID: ${elementId}`);
+          }
+        }
+        // --- Card Rendering and Interaction (Originais) ---
+        function createAppointmentEntryElement(appointment) {
+             try {
+                 if (!appointment || typeof appointment !== 'object' || !appointment.id) { throw new Error("Dados inválidos para criar card."); }
+                 const div = document.createElement('div'); div.className = 'appointment-entry'; div.dataset.appointmentId = appointment.id;
+                 // Aplica classe dark se necessário no momento da criação
+                 applyDarkModeClass(div);
+
+                 // Funções de formatação (com fallbacks)
+                 const formatDate = utils?.formatDate || function(d) { return d ? new Date(d).toLocaleDateString('pt-BR') : 'N/A'; };
+                 // Tenta formatar a hora de appointment.date, se falhar usa appointment.time
+                 const formatTime = function(d, t) {
+                     if (d) {
+                         try { return new Date(d).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit'}); } catch(e) { /* ignora erro e tenta o time */ }
+                     }
+                     return t || '--:--';
+                 };
+                 // Ícones (com fallbacks)
+                 const calendarIcon = icons?.calendar || '<i class="far fa-calendar-alt"></i>'; const clockIcon = icons?.clock || '<i class="far fa-clock"></i>'; const typeIcon = icons?.tag || '<i class="fas fa-tag"></i>'; const notesIcon = icons?.notes || '<i class="fas fa-sticky-note"></i>'; const viewIcon = icons?.eye || '<i class="fas fa-eye"></i>'; const editIcon = icons?.edit || '<i class="fas fa-edit"></i>'; const addIcon = icons?.add || '<i class="fas fa-plus"></i>'; const saveIcon = icons?.save || '<i class="fas fa-save"></i>'; const cancelIcon = icons?.cancel || '<i class="fas fa-times"></i>'; const userIcon = icons?.user || '<i class="fas fa-user"></i>'; const courseIcon = icons?.course || '<i class="fas fa-book"></i>'; const unitIcon = icons?.building || '<i class="fas fa-building"></i>';
+
+                 // Dados do agendamento (com fallbacks)
+                 const appDate = appointment.date ?? null; const appTime = appointment.time ?? null; const appType = appointment.type ?? 'Observação'; const appStudentName = appointment.studentName ?? 'N/A'; const appCourse = appointment.course ?? 'N/A'; const appUnit = appointment.unit ?? 'N/A'; const currentNotes = appointment.notes ?? '';
+                 const hasNotes = currentNotes.trim() !== '';
+                 const notesDisplayHTML = hasNotes ? `<div>${currentNotes.replace(/\n/g, '<br>')}</div>` : `<div class="no-notes">(Nenhuma observação registrada)</div>`;
+                 const editButtonText = hasNotes ? 'Editar Nota' : 'Adicionar Nota'; const editButtonIcon = hasNotes ? editIcon : addIcon;
+
+                 // Monta HTML do card
+                 div.innerHTML = `
+                     <div class="appointment-entry-header">
+                         <span class="appointment-date-time"> ${calendarIcon} ${formatDate(appDate)}    ${clockIcon} ${formatTime(appDate, appTime)} </span>
+                         <div class="appointment-header-right">
+                             <span class="appointment-type"> ${typeIcon} ${appType} </span>
+                             <span class="appointment-action-icon" title="Ver detalhes"> ${viewIcon} </span>
+                         </div>
+                     </div>
+                     <div class="appointment-student-info">
+                         <p title="Aluno">${userIcon} <span>${appStudentName}</span></p>
+                         <p title="Curso">${courseIcon} <span>${appCourse}</span></p>
+                         <p title="Unidade">${unitIcon} <span>${appUnit}</span></p>
+                     </div>
+                     <div class="appointment-notes-section">
+                         <div class="appointment-notes-display">
+                             <strong>${notesIcon} Observações:</strong>
+                             ${notesDisplayHTML}
+                         </div>
+                         <div class="appointment-notes-controls">
+                             <button class="btn btn-sm btn-outline-secondary btn-edit-note">
+                                 ${editButtonIcon} ${editButtonText}
+                             </button>
+                         </div>
+                         <div class="appointment-notes-edit-form">
+                             <textarea placeholder="Digite a observação aqui...">${currentNotes}</textarea>
+                             <div class="edit-actions">
+                                 <span class="edit-feedback"></span>
+                                 <button class="btn btn-sm btn-secondary btn-cancel-note" title="Cancelar"> ${cancelIcon} Cancelar </button>
+                                 <button class="btn btn-sm btn-primary btn-save-note" title="Salvar Alterações"> ${saveIcon} Salvar </button>
+                             </div>
+                         </div>
+                     </div>`;
+                 return div;
+             } catch (error) { console.error(`ERRO ao criar elemento para ID ${appointment?.id}:`, error); return null; }
+        }
+        function updateAppointmentNotes(appointmentId, newNotes, entryElement) {
+  try {
+    console.log(`DEBUG: updateAppointmentNotes - ID ${appointmentId}`);
+    if (!entryElement) throw new Error("Elemento card não fornecido.");
+
+    const feedbackEl = entryElement.querySelector('.edit-feedback');
+    const notesDisplayContainer = entryElement.querySelector('.appointment-notes-display');
+    const editForm = entryElement.querySelector('.appointment-notes-edit-form');
+    const editButton = entryElement.querySelector('.btn-edit-note');
+
+    if (!feedbackEl || !notesDisplayContainer || !editForm || !editButton)
+      throw new Error("Elementos internos não encontrados.");
+
+    const appointmentIndex = window.historicoAlunoData?.appointmentHistory.findIndex(app => app && String(app.id) === String(appointmentId));
+    if (appointmentIndex === -1) throw new Error(`Atendimento ${appointmentId} não encontrado.`);
+
+    const trimmedNotes = newNotes.trim();
+    window.historicoAlunoData.appointmentHistory[appointmentIndex].observacao = trimmedNotes;
+
+    // ✅ Salvar no backend
+    fetch(`/api/observacoes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agendamentos_id: appointmentId, texto: trimmedNotes })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Falha ao salvar observação no banco");
+      return res.json();
+    })
+    .then(() => {
+      console.log("Observação salva no banco com sucesso.");
+    })
+    .catch(err => {
+      console.error("Erro ao salvar observação no banco:", err);
+    });
+
+    // Atualiza UI
+    const notesIcon = icons?.notes || '<i class="fas fa-sticky-note"></i>';
+    const editIcon = icons?.edit || '<i class="fas fa-edit"></i>';
+    const addIcon = icons?.add || '<i class="fas fa-plus"></i>';
+    const hasNotes = trimmedNotes !== '';
+    notesDisplayContainer.innerHTML = `<strong>${notesIcon} Observações:</strong> ${hasNotes ? `<div>${trimmedNotes.replace(/\n/g, '<br>')}</div>` : `<div class="no-notes">(Nenhuma observação registrada)</div>`}`;
+    const editButtonText = hasNotes ? 'Editar Nota' : 'Adicionar Nota';
+    const editButtonIcon = hasNotes ? editIcon : addIcon;
+    editButton.innerHTML = `${editButtonIcon} ${editButtonText}`;
+
+    editForm.style.display = 'none';
+    const controls = entryElement.querySelector('.appointment-notes-controls');
+    if (controls) controls.style.display = 'block';
+    showInlineFeedback(feedbackEl, "Nota salva!", "success");
+  } catch (error) {
+    console.error("ERRO ao atualizar nota:", error);
+    const feedback = entryElement?.querySelector('.edit-feedback');
+    showInlineFeedback(feedback || null, `Erro ao salvar nota`, "error");
+  }
+}
+
+function toggleNoteEditForm(entryElement, appointmentId, forceHide = false) {
+  try {
+    console.log(`DEBUG: toggleNoteEditForm - ID ${appointmentId}, forceHide: ${forceHide}`);
+    if (!entryElement) throw new Error("Elemento card não fornecido.");
+
+    const editForm = entryElement.querySelector('.appointment-notes-edit-form');
+    const controls = entryElement.querySelector('.appointment-notes-controls');
+    const textarea = editForm?.querySelector('textarea');
+    const feedbackEl = editForm?.querySelector('.edit-feedback');
+
+    if (!editForm || !controls || !textarea || !feedbackEl)
+      throw new Error("Elementos internos não encontrados para toggle.");
+
+    if (feedbackEl) {
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'edit-feedback';
+    }
+
+    if (forceHide || window.getComputedStyle(editForm).display !== 'none') {
+      editForm.style.display = 'none';
+      controls.style.display = 'block';
+      console.log("DEBUG: Formulário de nota escondido.");
+    } else {
+      // 🔴 CORRIGIR ESTA LINHA AQUI:
+      const appointment = window.historicoAlunoData?.appointmentHistory.find(app => app && String(app.id) === String(appointmentId));
+      if (!appointment) throw new Error(`Atendimento ${appointmentId} não encontrado para editar nota.`);
+
+      textarea.value = appointment.observacao || ''; // Corrigido para 'observacao'
+      editForm.style.display = 'block';
+      controls.style.display = 'none';
+      textarea.focus();
+      console.log("DEBUG: Formulário de nota exibido.");
+    }
+  } catch (error) {
+    console.error("ERRO ao alternar formulário de nota:", error);
+  }
+}
+
+        function showInlineFeedback(element, message, type = "success") { if (!element) { console.warn("Feedback element não encontrado para mensagem:", message); return; } element.textContent = message; element.className = `edit-feedback ${type}`; setTimeout(() => { if(element) { element.textContent = ''; element.className = 'edit-feedback'; } }, 3000); }
+        function getInfoField(id) { return document.getElementById(id)?.querySelector('span')?.textContent ?? null; }
+
+        // --- applyDarkModeToDynamicElements (Separada da função de toggle inicial) ---
+        function applyDarkModeToDynamicElements(isDark) {
+            console.log(`DEBUG: Aplicando Dark Mode aos elementos dinâmicos: ${isDark}`);
+            // Seletores para elementos que são criados dinamicamente ou precisam ser atualizados
+            const dynamicSelectors = [
+                '.appointment-entry',
+                '.appointment-entry-header',
+                '.appointment-date-time',
+                '.appointment-type',
+                '.appointment-action-icon',
+                '.appointment-student-info',
+                '.appointment-student-info p',
+                '.appointment-student-info i',
+                '.appointment-student-info span',
+                '.appointment-notes-section',
+                '.appointment-notes-display',
+                '.appointment-notes-display strong',
+                '.appointment-notes-display .no-notes',
+                '.btn-outline-secondary',
+                '.appointment-notes-edit-form',
+                '.appointment-notes-edit-form textarea',
+                '.edit-feedback.success',
+                '.edit-feedback.error',
+                '.modal-content', // Para garantir que a modal aberta reflita o modo
+                '.modal-body p',
+                '.modal-body strong',
+                '.modal-body i',
+                '.modal-title',
+                '.modal-close-btn',
+                '.modal-body .notes-section',
+                '.modal-body .notes-content'
+             ];
+            const elementsToToggle = document.querySelectorAll(dynamicSelectors.join(', '));
+            elementsToToggle.forEach(el => { if (el) el.classList.toggle('dark', isDark); });
+
+            // Aplica ao overlay da modal se existir e estiver visível
+            if (modalOverlay && modalOverlay.classList.contains('active')) {
+                modalOverlay.classList.toggle('dark', isDark);
+            }
+        }
+
+        // --- Função applyDarkModeClass (Original, para criação de elementos) ---
+        function applyDarkModeClass(element) { if (element && localStorage.getItem('darkMode') === 'enabled') { element.classList.add('dark'); } }
+
+        // --- Funções da Modal (Originais) ---
+        function openAppointmentDetailsModal(appointmentId) {
+    console.log(`DEBUG: openAppointmentDetailsModal called with ID: ${appointmentId}`); // Log entry
+
+    if (!modalOverlay || !modalBody || !modalTitle) {
+        console.error("ERRO: Elementos do modal não encontrados em openAppointmentDetailsModal.");
+        return;
+    }
+
+    let appointment;
+
+    if (window.historicoAlunoData && window.historicoAlunoData.appointmentHistory) {
+         console.log("DEBUG: Searching for appointment in window.historicoAlunoData.appointmentHistory");
+         appointment = window.historicoAlunoData.appointmentHistory.find(app => app && String(app.id) === String(appointmentId));
+         console.log("DEBUG: Found appointment:", appointment); 
+    } else {
+         console.error("ERRO: Global 'historicoAlunoData' or its 'appointmentHistory' not found.");
+         modalBody.innerHTML = '<p style="color: red;">Erro interno: Não foi possível carregar os dados do histórico para o modal.</p>';
+         modalTitle.textContent = "Erro";
+         modalOverlay.classList.add('active'); 
+         return; 
+    }
+
+    if (!appointment) {
+        console.error(`ERRO: Appointment with ID ${appointmentId} not found in fetched data.`);
+        modalBody.innerHTML = `<p style="color: red;">Erro: Detalhes para o atendimento ID ${appointmentId} não encontrados.</p>`;
+        modalTitle.textContent = "Erro";
+    } else {
+        console.log("DEBUG: Populating modal body with appointment details.");
+        const createFullDate = (dateStr, timeStr) => {
+            if (!dateStr || !timeStr) return null;
+            // Ensure timeStr has seconds if needed, or handle HH:MM format
+            const timeParts = timeStr.split(':');
+            const formattedTime = timeParts.length === 2 ? `${timeStr}:00` : timeStr; // Add seconds if missing
+            try {
+                // Combine YYYY-MM-DD and HH:MM:SS for reliable parsing
+                return new Date(`${dateStr}T${formattedTime}`);
+            } catch (e) {
+                console.error("Error creating date from:", dateStr, timeStr, e);
+                return null; // Return null if parsing fails
+            }
+        };
+
+        // Define the formatting function (or get from utils)
+        const formatFullDateTime = (d) => {
+            if (!d || !(d instanceof Date) || isNaN(d)) return 'N/A'; // Check if valid Date object
+            return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+        };
+
+        const formatPhoneModal = typeof utils !== 'undefined' && utils?.formatPhone ? utils.formatPhone : function(p) { return p || 'N/A'; };
+        const icons = window.icons || {}; 
+
+         const calcularIdadeModal = (dataNasc) => {
+             if (!dataNasc) return 'N/A';
+             try {
+                 const nasc = new Date(dataNasc);
+                 const hoje = new Date();
+                 let idade = hoje.getFullYear() - nasc.getFullYear();
+                 const m = hoje.getMonth() - nasc.getMonth();
+                 if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+                 return isNaN(idade) ? 'N/A' : `${idade} anos`;
+             } catch(e) { return 'N/A'; }
+         };
+
+        const fullAppointmentDate = createFullDate(appointment.date, appointment.horario);
+
+
+        let modalHTML = ` <p><strong>${icons?.user || '<i class="fas fa-user"></i>'} Aluno:</strong> ${appointment.studentName || 'N/A'}</p> <p><strong>${icons?.birthday || '<i class="fas fa-birthday-cake"></i>'} Idade:</strong> ${calcularIdadeModal(appointment.studentAge)} </p> <p><strong>${icons?.graduation || '<i class="fas fa-graduation-cap"></i>'} Turma:</strong> ${appointment.grade || 'N/A'}</p> <p><strong>${icons?.calendar || '<i class="far fa-calendar-alt"></i>'} Data/Hora:</strong> ${formatFullDateTime(fullAppointmentDate)}</p> <p><strong>${icons?.tag || '<i class="fas fa-tag"></i>'} Tipo:</strong> ${appointment.type || 'N/A'}</p> <p><strong>${icons?.course || '<i class="fas fa-book"></i>'} Curso:</strong> ${appointment.course || 'N/A'}</p> <p><strong>${icons?.building || '<i class="fas fa-building"></i>'} Unidade:</strong> ${appointment.unit || 'N/A'}</p> <p><strong>${icons?.phone || '<i class="fas fa-phone"></i>'} Telefone:</strong> ${formatPhoneModal(appointment.phone)}</p> `;
+
+        if (appointment.observacao && appointment.observacao.trim() !== '') {
+             modalHTML += `<div class="notes-section"> <p><strong>${icons?.notes || '<i class="fas fa-sticky-note"></i>'} Observações Registradas:</strong></p> <div class="notes-content">${appointment.observacao.replace(/\n/g, '<br>')}</div> </div>`;
+         } else {
+             modalHTML += `<p><strong>${icons?.notes || '<i class="fas fa-sticky-note"></i>'} Observações:</strong> (Nenhuma nota registrada)</p>`;
+         }
+        modalBody.innerHTML = modalHTML;
+        modalTitle.textContent = `Detalhes: Atendimento #${appointment.id}`;
+    }
+
+    applyDarkModeToDynamicElements(localStorage.getItem('darkMode') === 'enabled');
+    console.log("DEBUG: Adding .active class to modalOverlay");
+    modalOverlay.classList.add('active'); 
+}
+        function closeModal() { if (modalOverlay) { modalOverlay.classList.remove('active'); } }
+
+    </script>
+
+</body>
+</html>

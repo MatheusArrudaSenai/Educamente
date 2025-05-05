@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Educa Mente</title>
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css"> <!-- Estilos Globais -->
+    <link rel="stylesheet" href="css/painel.css">
+    <!-- <link rel="stylesheet" href="css/style_dashboard.css"> --> <!-- Mover estilos específicos para cá depois -->
+    <!-- JS Dependencies -->
+    <script src="js/utils.js"></script>
+    <script src="js/icons.js"></script>
+    
+</head>
+<body>
+    <!-- Navbar (ATUALIZADA) -->
+     <nav class="navbar">
+       <div class="container navbar-container">
+         <a href="/painel" class="navbar-brand"> Educa Mente </a>
+         <ul class="navbar-menu">
+           <li class="navbar-item"> <a href="/painel" class="navbar-link active" title="Painel"> <span class="navbar-icon" id="icon-home"></span> <span>Dashboard</span> </a> </li>
+           <li class="navbar-item"> <a href="/historico" class="navbar-link" title="Histórico"> <span class="navbar-icon" id="icon-history"></span> <span>Histórico</span> </a> </li>
+           <li class="navbar-item"> <a href="/solicitacoes" class="navbar-link" title="Solicitações"> <span class="navbar-icon" id="icon-requests"></span> <span>Solicitações</span> </a> </li>
+         </ul>
+         <!-- Wrapper para agrupar ícones e switch -->
+         <div class="dark-mode-toggle-wrapper">
+           <i class="fas fa-sun" id="icon-sun" title="Modo Claro"></i>
+           <i class="fas fa-moon" id="icon-moon" title="Modo Escuro"></i>
+           <label class="switch">
+             <input type="checkbox" id="toggle-dark-mode">
+             <span class="slider"></span>
+           </label>
+         </div>
+       </div>
+     </nav>
+
+    <!-- Modal (CORRIGIDO - Spinner fora do body) -->
+    <div class="modal" id="appointment-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Detalhes do Atendimento</h2>
+          <button class="modal-close" id="close-modal">×</button>
+        </div>
+         <!-- Spinner AGORA está fora do modal-body -->
+         <div class="loading-spinner" id="modal-loading" style="display: none; margin: 2rem auto;"></div>
+         <!-- Corpo do modal (agora sem o spinner inicial) -->
+        <div class="modal-body" id="appointment-details">
+            <!-- Conteúdo será carregado aqui -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" id="close-appointment">Fechar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <div class="welcome-header"> <h1 class="welcome-name" id="welcome-name">Olá,...</h1> <p class="welcome-date" id="welcome-date">...</p> </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3">
+          <div class="grid-column" style="grid-column: span 1 / span 1; display: flex; flex-direction: column; gap: 32px;">
+            <!-- Card Solicitações Recentes -->
+            <div class="card"> <div class="card-header"> <h2 class="card-title">Solicitações Recentes</h2> <span class="badge badge-warning" id="requests-count-summary">...</span> </div> <div class="card-body" id="pending-requests"> <div id="urgent-requests-loading" class="loading-spinner" style="display: none;"></div> <div id="urgent-requests-list"> <p class="text-center text-gray-500" id="no-urgent-requests">Nenhuma solicitação pendente.</p> </div> </div> <div class="card-footer" style="text-align: center;"> <a href="/solicitacoes" class="footer-link">Ver Todas Solicitações</a> </div> </div>
+             <!-- Card Resumo do Dia -->
+            <div class="card"> <div class="card-header"> <h2 class="card-title">Resumo do Dia</h2> </div> <div class="card-body"> <div id="daily-summary-loading" class="loading-spinner" style="display: none;"></div> <div id="daily-summary-content"> <p class="text-center text-gray-500">Carregando resumo...</p> </div> </div> </div>
+          </div>
+          <!-- Card Agenda Semanal -->
+          <div class="grid-column" style="grid-column: span 2 / span 2;" id="calendar">
+            <div class="card"> <div class="card-header"> <div> <h2 class="card-title">Agenda Semanal</h2> </div> </div> <div class="card-body"> <div class="calendar-controls"> <button class="btn calendar-nav-btn" id="prev-week" title="Semana Anterior"> <span id="icon-chevron-left"></span> </button> <div class="week-range-display" id="week-range">Carregando...</div> <button class="btn calendar-nav-btn" id="next-week" title="Próxima Semana"> <span id="icon-chevron-right"></span> </button> </div> <div class="calendar-days" id="calendar-days"> <div class="loading-spinner" style="width: 20px; height: 20px; margin: 0.5rem auto;"></div> </div> <div class="time-slots-wrapper" id="time-slots"> <div class="loading-spinner" id="calendar-loading"></div> <ul class="compact-appointment-list" id="compact-appointment-list" style="display: none;"></ul> <div id="no-appointments-for-day" style="display: none;" class="no-appointments-message"> <i class="far fa-calendar-times"></i> <span>Nenhum atendimento agendado para este dia.</span> </div> <div id="calendar-error" style="display: none; color: red; text-align: center; padding: 1rem;">Erro ao carregar horários.</div> </div> </div> <div class="card-footer flex justify-end"> <button class="btn btn-secondary" id="new-appointment"> <span id="icon-plus" style="margin-right: 8px"></span> <span>Novo Atendimento</span> </button> </div> </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer"> <div class="container footer-content"> <p class="footer-text">© 2025 Educa Mente - Sistema de Gestão para Psicopedagogos</p> </div> </footer>
+    
+    <script src="js/painel.js"></script>
+</body>
+</html>

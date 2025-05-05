@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico | Educa Mente</title>
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Seus CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style_solicitacoes.css"> <!-- Pode ou não ser necessário -->
+    <link rel="stylesheet" href="css/historico.css">
+    <!-- Scripts Carregados Cedo -->
+    <script src="js/utils.js"></script>
+    <script src="js/icons.js"></script>
+
+    <style>
+        
+    </style>
+</head>
+<body>
+    <!-- Navbar (Copiada de solicitacoes.html) - CORRIGIDO ACTIVE LINK -->
+    <nav class="navbar">
+      <div class="container navbar-container">
+        <a href="/painel" class="navbar-brand">
+          Educa Mente
+        </a>
+        <ul class="navbar-menu">
+          <li class="navbar-item"> <a href="/painel" class="navbar-link" title="Painel"> <span class="navbar-icon" id="icon-home"></span> <span>Dashboard</span> </a> </li>
+          <li class="navbar-item"> <a href="/historico" class="navbar-link active" title="Histórico"> <span class="navbar-icon" id="icon-history"></span> <span>Histórico</span> </a> </li> <!-- Active aqui -->
+          <li class="navbar-item"> <a href="/solicitacoes" class="navbar-link" title="Solicitações"> <span class="navbar-icon" id="icon-requests"></span> <span>Solicitações</span> </a> </li> <!-- Sem active aqui -->
+        </ul>
+        <!-- Wrapper para agrupar ícones e switch (Igual Solicitacoes) -->
+        <div class="dark-mode-toggle-wrapper">
+          <i class="fas fa-sun" id="icon-sun" title="Modo Claro"></i>
+          <i class="fas fa-moon" id="icon-moon" title="Modo Escuro"></i>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content (Original do historico.html) -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header"> <h1 class="page-title">Histórico</h1> <p class="page-subtitle">Visualize os atendimentos anteriores</p> </div>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Abas -->
+                    <div class="tabs">
+                        <div class="tab active" data-tab="all-history">Atendimentos Realizados</div>
+                        <div class="tab" data-tab="student-history">Histórico por Aluno</div>
+                    </div>
+
+                    <!-- Conteúdo Aba 1: Atendimentos Realizados -->
+                    <div class="tab-content active" id="tab-all-history">
+                        <section class="search-filter-section">
+                            <div class="search-bar-container"> <i class="fas fa-search"></i> <input type="text" id="all-history-search-input" placeholder="Pesquisar em Aluno, Curso ou Tipo..."> </div>
+                            <div class="filter-buttons-container">
+                                <div class="filter-button-wrapper">
+                                   <button class="filter-button" data-controls="all-history-unidade-dropdown">
+                                    <i class="fas fa-building"></i>
+                                    <span id="all-history-unidade-btn-text">Unidade</span>
+                                    <i class="fas fa-caret-down"></i>
+                                  </button>
+                                     <div class="filter-dropdown" id="all-history-unidade-dropdown">
+                                      <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="all">Mostrar Todas</a>
+                                      <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Lauro de Freitas">Lauro de Freitas</a>
+                                      <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI CIMATEC">CIMATEC</a>
+                                      <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Camaçari">Camaçari</a>
+                                      <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Dendezeiros">Dendezeiros</a>
+                                      <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Alagoinhas">Alagoinhas</a>
+                                       </div>
+                                  </div>
+                                <div class="filter-button-wrapper">
+                                   <button class="filter-button" data-controls="all-history-data-dropdown">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <span id="all-history-data-btn-text">Data</span>
+                                    <i class="fas fa-caret-down"></i>
+                                  </button> 
+                                  <div class="filter-dropdown" id="all-history-data-dropdown">
+                                    <a href="#" class="sort-option" data-sort-order="desc">Mais recentes</a>
+                                    <a href="#" class="sort-option" data-sort-order="asc">Mais antigos</a>
+                                     </div>
+                                 </div>
+                            </div>
+                        </section>
+                        <div class="loading-spinner" id="history-loading" style="display: none;"></div>
+                        <div id="history-list" class="history-cards-container" style="display: none;"></div>
+                        <div id="no-history" style="display: none;" class="text-center py-12 text-gray-500"> Nenhum histórico encontrado. </div>
+                    </div>
+
+                     <!-- Conteúdo Aba 2: Histórico por Aluno -->
+                    <div class="tab-content" id="tab-student-history">
+                        <section class="search-filter-section">
+                            <div class="search-bar-container"> <i class="fas fa-search"></i> <input type="text" id="student-search-input" placeholder="Pesquisar nome do aluno..."> </div>
+                             <div class="filter-buttons-container">
+                                <div class="filter-button-wrapper">
+                                   <button class="filter-button" data-controls="student-history-unidade-dropdown">
+                                    <i class="fas fa-building"></i>
+                                    <span id="student-history-unidade-btn-text">Unidade</span>
+                                    <i class="fas fa-caret-down"></i>
+                                  </button> 
+                                  <div class="filter-dropdown" id="student-history-unidade-dropdown">
+                                     <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="all">Mostrar Todas</a>
+                                    <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Lauro de Freitas">Lauro de Freitas</a>
+                                    <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI CIMATEC">CIMATEC</a>
+                                    <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Camaçari">Camaçari</a>
+                                    <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Dendezeiros">Dendezeiros</a>
+                                    <a href="#" class="filter-option" data-filter-type="unit" data-filter-value="SENAI Alagoinhas">Alagoinhas</a>
+                                    </div>
+                                  </div>
+                                <div class="filter-button-wrapper">
+                                   <button class="filter-button" data-controls="student-history-data-dropdown">
+                                    <i class="far fa-calendar-alt"></i><span id="student-history-data-btn-text">Data</span><i class="fas fa-caret-down"></i></button> <div class="filter-dropdown" id="student-history-data-dropdown"> <a href="#" class="sort-option" data-sort-order="desc">Mais recentes</a> <a href="#" class="sort-option" data-sort-order="asc">Mais antigos</a> </div> </div>
+                             </div>
+                        </section>
+                         <div class="loading-spinner" id="student-history-loading" style="display: none;"></div>
+                         <div id="student-history-list" class="history-cards-container" style="display: none;"></div>
+                         <div id="no-student-history" style="display: none;" class="text-center py-12 text-gray-500"> Digite o nome do aluno para buscar. </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Original do historico.html) -->
+    <footer class="footer"> <div class="container footer-content"> <p class="footer-text">© 2025 Educa Mente</p> </div> </footer>
+
+    <script src="js/historico.js"></script>
+</body>
+</html>

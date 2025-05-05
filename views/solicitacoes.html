@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações | Educa Mente</title>
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+    <!-- Fontes do Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css"> <!-- Garanta que este arquivo contenha os estilos do wrapper/icones sol/lua -->
+    <link rel="stylesheet" href="css/style_solicitacoes.css">
+
+    <!-- JS Dependencies -->
+    <script src="js/icons.js"></script> <!-- Ajuste caminho se necessário -->
+
+    <style>
+        /* Variáveis Globais (caso necessário) */
+        :root {
+          --primary: #0A4275;
+          --secondary: #1575A3;
+          /* Variáveis do Switch */
+          --switch-bg-unchecked: #ccc;
+          --switch-bg-checked: var(--secondary, #1575A3);
+          --switch-slider-color: white;
+          --white: #FFFFFF; /* Adicionando --white para consistência */
+        }
+
+        /* Estilos básicos (Mantidos) */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .completed-cards-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; padding: 1rem 0; }
+        .appointment-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .text-light { color: #6c757d; } .font-medium { font-weight: 500; } .text-sm { font-size: 0.875rem; } .mt-1 { margin-top: 0.25rem; } .mt-4 { margin-top: 1rem; } .gap-1 { gap: 0.25rem; } .gap-3 { gap: 0.75rem; } .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; } .flex-col { flex-direction: column; } @media (min-width: 1024px) { .lg\:flex-row { flex-direction: row; } .lg\:items-center { align-items: center;} } @media (min-width: 640px) { .sm\:flex-row { flex-direction: row; } .sm\:items-center { align-items: center;} } .badge { display: inline-block; padding: .35em .65em; font-size: .75em; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; } .badge-primary { background-color: #0d6efd; } .status.finalized { background-color: #6c757d; color: white; cursor: pointer; } .py-12 { padding-top: 3rem; padding-bottom: 3rem; } .text-center { text-align: center; } .text-gray-500 { color: #6b7280; }
+
+        /* Estilos para o Logo em Texto (Mantidos) */
+        .navbar-brand {
+            font-family: 'Audiowide', sans-serif;
+            font-size: 1.6rem;
+            color: white !important;
+            text-decoration: none;
+            font-weight: normal;
+            padding: 0.25rem 0;
+        }
+
+        /* Navbar (Mantidos estilos básicos) */
+        .navbar { background-color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; border-bottom: 1px solid var(--primary); }
+        .navbar-container { display: flex; justify-content: space-between; align-items: center; height: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        .navbar-link { color: var(--white, #FFFFFF); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; padding: 8px 0; position: relative; cursor: pointer; transition: color 0.2s; opacity: 0.85; font-size: 0.9rem; }
+        .navbar-link:after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background-color: var(--white, #FFFFFF); transition: width 0.3s ease-in-out; }
+        .navbar-link.active, .navbar-link:hover { color: var(--white, #FFFFFF); opacity: 1; }
+        .navbar-link.active:after { width: 100%; }
+        .navbar-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+        .navbar-icon svg, .navbar-icon i { width: 18px; height: 18px; color: var(--white, #FFFFFF); vertical-align: middle; }
+
+
+        /* === ESTILOS DARK MODE (Exceto para o Switch e Wrapper) === */
+        body.dark { background-color: #222; color: #eee; }
+        body.dark .navbar { background-color: #333; border-bottom-color: #444; }
+        body.dark .navbar-brand { color: white !important; text-shadow: none; }
+        body.dark .navbar-link { color: #ccc; }
+        body.dark .navbar-link.active, body.dark .navbar-link:hover { color: #fff; }
+        body.dark .card { background-color: #333; border-color: #444; }
+        body.dark .card-header { border-bottom-color: #444; }
+        body.dark .page-title, body.dark .card-title { color: #eee; }
+        body.dark .page-subtitle { color: #bbb; }
+        body.dark .appointment-card { background-color: #444; border-color: #555; color: #ddd; }
+        body.dark .text-light { color: #aaa; }
+        body.dark .header { color: #eee; border-bottom-color: #555; }
+        body.dark .table-container table th { background-color: #3a3a3a; border-bottom-color: #555;}
+        body.dark .table-container table td { border-bottom-color: #555; }
+        body.dark .table-container table tr:hover { background-color: #4a4a4a; }
+        body.dark .search-filter-section { background-color: #3a3a3a; border-bottom-color: #555; }
+        body.dark .search-bar-container { background-color: #555; }
+        body.dark .search-bar-container input { color: #eee; }
+        body.dark .search-bar-container input::placeholder { color: #aaa; }
+        body.dark .filter-button { background-color: #555; color: #eee; }
+        body.dark .filter-button:hover, body.dark .filter-button.active { background-color: #666; }
+        body.dark .filter-dropdown { background-color: #444; border-color: #555; }
+        body.dark .filter-dropdown a { color: #ccc; border-bottom-color: #555; }
+        body.dark .filter-dropdown a:hover { background-color: #555; }
+        body.dark .footer { background-color: #333; border-top-color: #444; color: #ccc; }
+        /* === FIM DOS ESTILOS DARK MODE (Exceto para o Switch e Wrapper) === */
+
+        /* === ESTILOS GLOBAIS PARA O SWITCH (MODO CLARO E ESCURO) === */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; cursor: pointer; vertical-align: middle; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--switch-bg-unchecked); border-radius: 20px; transition: background-color 0.3s; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: var(--switch-slider-color); border-radius: 50%; transition: transform 0.3s; }
+        input:checked + .slider { background-color: var(--switch-bg-checked); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        /* === FIM DOS ESTILOS GLOBAIS PARA O SWITCH === */
+
+        /* --- CSS PARA EVITAR FLASH NA TROCA DE TEMA --- */
+        .no-transitions * { transition: none !important; }
+        /* --- FIM CSS PARA EVITAR FLASH --- */
+
+        /* === CSS PARA QUEBRA DE LINHA NA TABELA (COM EXCEÇÕES) === */
+        main.table-container table th, main.table-container table td { white-space: normal !important; word-wrap: break-word; vertical-align: middle; }
+        main.table-container table th:nth-child(1), main.table-container table td:nth-child(1) { white-space: nowrap !important; width: 5%; max-width: 50px; text-align: center; }
+        main.table-container table th:nth-child(5), main.table-container table td:nth-child(5) { white-space: nowrap !important; min-width: 120px; }
+        main.table-container th:nth-child(8), main.table-container td:nth-child(8) { white-space: nowrap !important; min-width: 180px; }
+        /* === FIM CSS QUEBRA DE LINHA COM EXCEÇÕES === */
+
+        /* --- INÍCIO: ESTILOS PARA DARK MODE TOGGLE WRAPPER E ÍCONES (Sol/Lua) --- */
+        /* Idealmente, mover para styles.css */
+        .dark-mode-toggle-wrapper { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+        .dark-mode-toggle-wrapper i { font-size: 1.1rem; line-height: 1; vertical-align: middle; cursor: default; color: var(--white, #FFFFFF); transition: color 0.3s; }
+        body.dark .dark-mode-toggle-wrapper i { color: #f0f0f0; }
+        #icon-sun { display: inline-block; }
+        #icon-moon { display: none; }
+        body.dark #icon-sun { display: none; }
+        body.dark #icon-moon { display: inline-block; }
+        .dark-mode-toggle-wrapper .switch { margin: 0; }
+        /* --- FIM: ESTILOS PARA DARK MODE TOGGLE WRAPPER E ÍCONES --- */
+
+    </style>
+</head>
+<body>
+    <!-- Navbar (COM WRAPPER ADICIONADO) -->
+    <nav class="navbar">
+      <div class="container navbar-container">
+        <a href="/painel" class="navbar-brand">
+          Educa Mente
+        </a>
+        <ul class="navbar-menu">
+          <li class="navbar-item"> <a href="/painel" class="navbar-link" title="Painel"> <span class="navbar-icon" id="icon-home"></span> <span>Dashboard</span> </a> </li>
+          <li class="navbar-item"> <a href="/historico" class="navbar-link" title="Histórico"> <span class="navbar-icon" id="icon-history"></span> <span>Histórico</span> </a> </li>
+          <li class="navbar-item"> <a href="/solicitacoes" class="navbar-link active" title="Solicitações"> <span class="navbar-icon" id="icon-requests"></span> <span>Solicitações</span> </a> </li>
+        </ul>
+        <!-- Wrapper para agrupar ícones e switch -->
+        <div class="dark-mode-toggle-wrapper">
+          <i class="fas fa-sun" id="icon-sun" title="Modo Claro"></i>
+          <i class="fas fa-moon" id="icon-moon" title="Modo Escuro"></i>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content (Inalterado) -->
+    <main class="main-content">
+      <div class="container">
+        <div class="page-header"> <h1 class="page-title">Solicitações</h1> <p class="page-subtitle">Gerencie as solicitações de atendimento</p> </div>
+        <div class="card">
+          <div class="card-header"> <h2 class="card-title">Gerenciamento de Solicitações</h2> </div>
+          <div class="card-body">
+            <div class="tabs"> <div class="tab active" data-tab="pending">Pendentes</div> <div class="tab" data-tab="completed">Finalizadas</div> </div>
+            <div class="tab-content active" id="tab-pending">
+              <!-- Conteúdo da aba pendente... -->
+              <header class="header"> <h1>Lista de Solicitações</h1> <a class="btn-primary" href="/formulario">Nova Solicitação</a> </header>
+              <section class="search-filter-section">
+                <div class="search-bar-container"> <i class="fas fa-search"></i> <input type="text" id="search-input" placeholder="Pesquisar em Aluno ou Curso..."> </div>
+                <div class="filter-buttons-container">
+                  <div class="filter-button-wrapper"> <button class="filter-button" data-controls="unidade-dropdown"><i class="fas fa-building"></i><span id="unidade-btn-text">Unidade</span><i class="fas fa-caret-down"></i></button> <div class="filter-dropdown" id="unidade-dropdown"> <a href="#" class="filter-option" data-filter-type="unidade" data-filter-value="all">Mostrar Todas</a> <a href="#" class="filter-option" data-filter-type="unidade" data-filter-value="SENAI Lauro de Freitas">SENAI Lauro de Freitas</a> <a href="#" class="filter-option" data-filter-type="unidade" data-filter-value="SENAI CIMATEC">SENAI CIMATEC</a> <a href="#" class="filter-option" data-filter-type="unidade" data-filter-value="SENAI Camaçari">SENAI Camaçari</a> <a href="#" class="filter-option" data-filter-type="unidade" data-filter-value="SENAI Dendezeiros">SENAI Dendezeiros</a> <a href="#" class="filter-option" data-filter-type="unidade" data-filter-value="SENAI Alagoinhas">SENAI Alagoinhas</a> </div> </div>
+                  <div class="filter-button-wrapper"> <button class="filter-button" data-controls="data-dropdown"><i class="far fa-calendar-alt"></i><span id="data-btn-text">Data de Envio</span><i class="fas fa-caret-down"></i></button> <div class="filter-dropdown" id="data-dropdown"> <a href="#" class="sort-option" data-sort-order="desc">Mais recentes</a> <a href="#" class="sort-option" data-sort-order="asc">Mais antigos</a> </div> </div>
+                  <div class="filter-button-wrapper"> <button class="filter-button" data-controls="status-dropdown"><i class="fas fa-tag"></i><span id="status-btn-text">Status</span><i class="fas fa-caret-down"></i></button> <div class="filter-dropdown" id="status-dropdown"> <a href="#" class="filter-option" data-filter-type="status" data-filter-value="all">Mostrar Todos</a> <a href="#" class="filter-option" data-filter-type="status" data-filter-value="Aprovado">Aprovado</a> <a href="#" class="filter-option" data-filter-type="status" data-filter-value="Rejeitado">Rejeitado</a> <a href="#" class="filter-option" data-filter-type="status" data-filter-value="Pendente">Pendente</a> <a href="#" class="filter-option" data-filter-type="status" data-filter-value="Finalizado">Finalizado</a> </div> </div>
+                </div>
+              </section>
+              <main class="table-container">
+                <table>
+                  <thead> <tr> <th>#</th> <th>Aluno</th> <th>Curso</th> <th>Unidade</th> <th>Telefone</th> <th>Data de Envio</th> <th>Status</th> <th>Ações</th> </tr> </thead>
+                  <tbody id="solicitacoes-tbody"></tbody>
+                </table>
+                <div id="no-results-message" style="display: none; text-align: center; padding: 2rem; color: #6c757d;">Nenhuma solicitação encontrada com os filtros atuais.</div>
+                <div id="no-pending" style="display: none; text-align: center; padding: 2rem; color: #6c757d;">Nenhuma solicitação pendente encontrada.</div>
+              </main>
+            </div>
+            <div class="tab-content" id="tab-completed">
+              <!-- Conteúdo da aba finalizadas... -->
+              <header class="header"> <h1>Lista de Solicitações Finalizadas</h1> </header>
+              <div id="completed-list" class="completed-cards-container" style="display: none;"></div>
+              <div id="no-completed" style="display: none;" class="text-center py-12 text-gray-500">Nenhuma solicitação finalizada encontrada.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer (Inalterado) -->
+    <footer class="footer"> <div class="container footer-content"> <p class="footer-text">© 2025 Educa Mente - Sistema de Gestão para Psicopedagogos</p> </div> </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/solicitacoes.js"></script> <!-- Script principal da página -->
+    <script>
+
+        function desfazerFinalizacao(solicitacaoId) {
+        fetch(`/solicitacoes/${solicitacaoId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'Pendente' })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro ao desfazer finalização');
+            loadCompletedRequests();
+            if (typeof initializeSolicitacoes === 'function') {
+                initializeSolicitacoes(); // ✅ Agora será chamada corretamente
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao desfazer finalização:', error);
+            alert('Não foi possível desfazer. Tente novamente.');
+        });
+    }
+    
+        
+    // === Função GLOBAL para renderizar a lista de Finalizadas (COM CORREÇÃO DE ALINHAMENTO) ===
+        function loadCompletedRequests() {
+    const completedListDiv = document.getElementById('completed-list');
+    const noCompletedDiv = document.getElementById('no-completed');
+
+    if (!completedListDiv || !noCompletedDiv) {
+        console.error("Elementos #completed-list ou #no-completed não encontrados.");
+        return;
+    }
+
+    fetch('/api/solicitacoes')
+        .then(response => response.json())
+        .then(solicitacoes => {
+            const finalizadas = solicitacoes.filter(s => s.status === 'Finalizado');
+
+            if (finalizadas.length === 0) {
+                noCompletedDiv.style.display = 'block';
+                completedListDiv.style.display = 'none';
+                return;
+            }
+
+            noCompletedDiv.style.display = 'none';
+            completedListDiv.style.display = 'grid';
+
+            completedListDiv.innerHTML = finalizadas.map(solicitacao => {
+                return `
+                    <div class="appointment-card ${document.body.classList.contains('dark') ? 'dark' : ''}" data-id="${solicitacao.id}">
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <div>
+                                <h3 class="font-medium">${solicitacao.nome}</h3>
+                                <div class="text-sm text-light mt-1">
+                                    <p><i class="fas fa-book"></i> ${solicitacao.curso}</p>
+                                    <p><i class="fas fa-building"></i> ${solicitacao.instituicao}</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-light">
+                                <p><i class="fas fa-phone"></i> ${solicitacao.telefone || 'Não informado'}</p>
+                                <p><i class="fas fa-calendar-alt"></i> Enviado: ${new Date(solicitacao.criado_em).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span class="status finalized" onclick="desfazerFinalizacao(${solicitacao.id})">Desfazer</span>
+                            <span><i class="far fa-clock"></i> Finalizado: ${new Date(solicitacao.criado_em).toLocaleDateString()}</span>
+                        </div>
+                    </div>`;
+            }).join('');
+        })
+        .catch(err => {
+            console.error('Erro ao carregar finalizadas:', err);
+            completedListDiv.innerHTML = '<p style="color: red;">Erro ao carregar solicitações finalizadas.</p>';
+        });
+    }
+
+
+
+        // === Script DOMContentLoaded (Mantém lógica para evitar flash) ===
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("[Inline Script] DOMContentLoaded para Solicitacoes.");
+            // Verifica dependências essenciais
+            if (typeof data === 'undefined' || typeof utils === 'undefined' || typeof icons === 'undefined') {
+                console.error("[Inline Script] ERRO CRÍTICO: Dependências data, utils ou icons não carregadas. A página pode não funcionar corretamente.");
+                // Opcional: Mostrar mensagem para o usuário
+                // document.body.innerHTML = '<p style="color: red; text-align: center; padding: 2rem;">Erro crítico ao carregar dependências. Recarregue a página ou contate o suporte.</p>';
+                // return; // Impede a execução do resto se as dependências falharem
+            }
+
+            // Seta ícones da Navbar
+            try {
+                document.getElementById('icon-home').innerHTML = icons.home || '?';
+                document.getElementById('icon-history').innerHTML = icons.history || '?';
+                document.getElementById('icon-requests').innerHTML = icons.requests || '?';
+            } catch (e) {
+                console.error("[Inline Script] Erro ao setar Navbar icons:", e);
+            }
+
+            // Configura Abas (Tabs)
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            if (tabs.length > 0 && tabContents.length > 0) {
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const currentActiveTab = document.querySelector('.tab.active');
+                        const tabName = this.getAttribute('data-tab');
+                        if (currentActiveTab === this) return; // Não faz nada se clicar na aba já ativa
+
+                        // Desativa aba e conteúdo atuais
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(content => content.classList.remove('active'));
+
+                        // Ativa nova aba e conteúdo
+                        this.classList.add('active');
+                        const activeContent = document.getElementById(`tab-${tabName}`);
+                        if (activeContent) {
+                            activeContent.classList.add('active');
+                            // Carrega/Atualiza conteúdo da aba clicada
+                            if (tabName === 'completed') {
+                                if (typeof loadCompletedRequests === 'function') {
+                                    loadCompletedRequests();
+                                } else {
+                                     console.error("Função loadCompletedRequests não encontrada ao clicar na aba.");
+                                }
+                            } else if (tabName === 'pending') {
+                                // Se existir uma função específica para recarregar pendentes, chame-a
+                                if (typeof initializeSolicitacoes === 'function') {
+                                    initializeSolicitacoes(); // Ou uma função como reloadPendingRequests()
+                                } else {
+                                    console.warn("Função para recarregar pendentes não encontrada ao clicar na aba.");
+                                }
+                            }
+                            // Aplica estilo dark aos cards se necessário
+                            document.querySelectorAll(`#${activeContent.id} .appointment-card`).forEach(card => card.classList.toggle('dark', document.body.classList.contains('dark')));
+                        } else {
+                            console.error(`Conteúdo da aba não encontrado: #tab-${tabName}`);
+                        }
+                    });
+                });
+            } else {
+                console.warn("[Inline Script] Abas ou conteúdos das abas não encontrados.");
+            }
+
+            // Configura Toggle Dark Mode
+            const toggle = document.getElementById('toggle-dark-mode');
+            if (toggle) {
+                // Função para aplicar dark mode e evitar flash
+                const applyDarkMode = (isDark) => {
+                    document.body.classList.add('no-transitions'); // Desabilita transições
+                    document.body.classList.toggle('dark', isDark); // Aplica/remove classe dark
+                    // Atualiza estilo dos cards visíveis
+                    document.querySelectorAll('.appointment-card').forEach(card => card.classList.toggle('dark', isDark));
+                     // Força reflow/repaint antes de reabilitar transições
+                    requestAnimationFrame(() => {
+                       requestAnimationFrame(() => { document.body.classList.remove('no-transitions'); });
+                    });
+                };
+
+                // Aplica tema inicial baseado no localStorage
+                const darkModePref = localStorage.getItem('darkMode') === 'enabled';
+                toggle.checked = darkModePref;
+                applyDarkMode(darkModePref); // Aplica o tema inicial
+
+                // Listener para mudanças no toggle
+                toggle.addEventListener('change', function() {
+                    const isDark = this.checked;
+                    applyDarkMode(isDark); // Aplica o novo tema
+                    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled'); // Salva preferência
+                    // Não precisa recarregar conteúdo aqui, applyDarkMode já ajusta os cards visíveis
+                });
+            } else {
+                 console.warn("Toggle de dark mode não encontrado.");
+            }
+
+            // Carga inicial da aba ativa (Pendentes por padrão ou a que estiver com .active)
+            const activeTabOnInit = document.querySelector('.tab.active');
+            if (activeTabOnInit) {
+                const initialTabName = activeTabOnInit.getAttribute('data-tab');
+                console.log(`[Inline Script] Carregando conteúdo inicial da aba: ${initialTabName}`);
+                if (initialTabName === 'completed') {
+                    if (typeof loadCompletedRequests === 'function') { loadCompletedRequests(); }
+                    else { console.error("Função loadCompletedRequests não encontrada para carga inicial da aba 'completed'."); }
+                } else if (initialTabName === 'pending') {
+                     if (typeof initializeSolicitacoes === 'function') { initializeSolicitacoes(); }
+                     else { console.error("Função essencial initializeSolicitacoes de script_solicitacoes.js não encontrada para carga inicial da aba 'pending'."); }
+                }
+            } else {
+                 console.warn("Nenhuma aba ativa encontrada no carregamento inicial. Carregando pendentes como padrão.");
+                 if (typeof initializeSolicitacoes === 'function') { initializeSolicitacoes(); }
+                 else { console.error("Função essencial initializeSolicitacoes de script_solicitacoes.js não encontrada para carga padrão."); }
+            }
+
+            console.log("[Inline Script] Configuração UI de Solicitacoes finalizada.");
+        });
+
+        function desfazerFinalizacao(solicitacaoId) {
+        fetch(`/solicitacoes/${solicitacaoId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: 'Pendente' })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao desfazer finalização');
+        }
+        // Atualiza as abas
+        loadCompletedRequests(); // Atualiza aba de finalizadas
+        if (typeof initializeSolicitacoes === 'function') {
+            initializeSolicitacoes(); // Atualiza aba de pendentes
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao desfazer finalização:', error);
+        alert('Não foi possível desfazer. Tente novamente.');
+    });
+}
+document.body.addEventListener('click', async e => {
+    const button = e.target.closest('.btn-undo');
+    if (!button) return;
+
+    const id = parseInt(button.dataset.id);
+    try {
+        const res = await fetch(`/solicitacoes/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'Pendente' })
+        });
+        if (res.ok) {
+            // Atualiza o status local
+            allSolicitacoes = allSolicitacoes.map(s => s.id === id ? { ...s, status: 'Pendente' } : s);
+
+            // Re-renderiza as tabelas
+            filterRows();
+
+            // Remove da tabela de finalizados (opcional)
+            const row = button.closest('tr');
+            if (row) row.remove();
+        } else {
+            alert('Erro ao desfazer finalização');
+        }
+    } catch (err) {
+        console.error('Erro ao desfazer finalização:', err);
+    }
+});
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - EDUCA MENTE</title>
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="css/style_agendamento.css">
+    <!-- Importando a fonte Audiowide -->
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Agendamento</h1>
+        </header>
+
+        <main class="form-container">
+            <form action="/agendar" method="post">
+                <!-- Escolha de Data -->
+                <div class="input-group">
+                    <label>
+                        Escolha uma data disponível:
+                        <input type="date" id="calendar" name="calendar" required>
+                    </label>
+                </div>
+                
+
+                <!-- Escolha de Horário -->
+                <div class="input-group">
+                    <label>
+                        Escolha um horário:
+                        <input type="time" name="time" id="time" required>
+                    </label>
+                </div>
+                
+
+                <!-- Observações -->
+                <div class="input-group">
+                    <label for="observations">Observações:</label>
+                    <textarea id="observations" name="observations" rows="4" placeholder="Escreva observações, se necessário."></textarea>
+                </div>
+
+                <!-- input para salvar o ID da solicitação -->
+                <input type="hidden" id="solicitacoes_id" name="solicitacoes_id" value="">
+
+                <!-- Botão de Enviar -->
+                <button type="submit" class="btn-primary" href="/solicitacoes">Confirmar Agendamento</button>
+            </form>
+        </main>
+    </div>
+    
+    <script>
+        // Pegar o ID da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const solicitacaoId = urlParams.get('id');
+    
+        // Preencher o campo hidden no formulário
+        if (solicitacaoId) {
+            document.getElementById('solicitacoes_id').value = solicitacaoId;
+        }
+
+        const calendarInput = document.getElementById('calendar');
+        if (calendarInput) {
+            calendarInput.addEventListener('click', function() {
+                try {
+                    // Tenta usar o método showPicker() moderno para abrir o calendário
+                    if (this.showPicker) {
+                        this.showPicker();
+                    } else {
+                        // Como fallback, apenas foca no campo (comportamento padrão)
+                        this.focus();
+                        // console.warn('Element.showPicker() não suportado, focando no elemento em vez disso.'); // Mensagem opcional no console
+                    }
+                } catch (error) {
+                    // Em caso de erro, foca no campo como fallback
+                    console.error('Erro ao tentar mostrar o seletor de data:', error);
+                    this.focus();
+                }
+            });
+        }
+
+        const timeInput = document.getElementById('time');
+        if (timeInput) {
+            timeInput.addEventListener('click', function() {
+                try {
+                    // Tenta usar o método showPicker() moderno para abrir o calendário
+                    if (this.showPicker) {
+                        this.showPicker();
+                    } else {
+                        // Como fallback, apenas foca no campo (comportamento padrão)
+                        this.focus();
+                        // console.warn('Element.showPicker() não suportado, focando no elemento em vez disso.'); // Mensagem opcional no console
+                    }
+                } catch (error) {
+                    // Em caso de erro, foca no campo como fallback
+                    console.error('Erro ao tentar mostrar o seletor de data:', error);
+                    this.focus();
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
+
