@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: educa-mente
+    env: node
+    branch: main
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    healthCheckPath: /
+    plan: free
