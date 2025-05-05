@@ -498,8 +498,10 @@ sequelize.sync({ force: false })
 app.use(express.static('public'));
 
 
-// Inicia servidor
-app.listen(3030, () => {
-    console.log("Servidor pronto na porta 3030...");
+// Inicia servidor/render
+const PORT = process.env.PORT || 3030;
+app.listen(PORT, () => {
+    console.log(`Servidor pronto na porta ${PORT}...`);
 });
+
 
