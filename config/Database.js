@@ -1,9 +1,15 @@
 const { Sequelize } = require('sequelize');
 
-// Conexão com o banco de dados
-const db = new Sequelize('sistema_escolar', 'root', '', {
-    host: 'localhost',
-    dialect: 'mysql'
-});
+const db = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT || 'postgres',
+    port: process.env.DB_PORT || 5432,
+    logging: false,
+  }
+);
 
 module.exports = db;
